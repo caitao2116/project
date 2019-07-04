@@ -1,6 +1,7 @@
 package com.pinyougou.manager.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +28,7 @@ public class BrandController {
 	}
 	
 	@RequestMapping("/findPage")
+	//参数1：当前页码；参数2：每页显示的条数
 	public PageResult findPage(int page,int size){
 		return brandService.findPage(page, size);
 		
@@ -75,6 +77,11 @@ public class BrandController {
 	@RequestMapping("/search")
 	public PageResult search(@RequestBody TbBrand brand,int page,int size) {
 		return brandService.findPage(brand, page, size);
+	}
+	
+	@RequestMapping("/selectOptionList")
+	public List<Map> selectOptionList(){
+		return brandService.selectOptionList();
 	}
 
 }

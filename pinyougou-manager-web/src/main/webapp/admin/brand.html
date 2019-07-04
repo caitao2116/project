@@ -19,106 +19,11 @@
 	<link rel="stylesheet" href="../plugins/angularjs/pagination.css">
 	<!-- 分页组件结束 -->
 	
-	<script>
-		var app =angular.module('pinyougou',['pagination']);
-		app.controller('brandController',function($scope,$http){
-			$scope.findAll=function(){
-				$http.get('../brand/findAll.do').success(function(response){
-					$scope.list=response;
-				});
-			}
-			
-			//分页控件配置
-			$scope.paginationConf = {
-					currentPage: 1,
-					totalItems: 10,
-					itemsPerPage: 10,
-					perPageOptions: [10, 20, 30, 40, 50],
-					onChange: function(){
-						$scope.reloadList();
-					}
-			};
-			//刷新列表
-			$scope.reloadList = function(){
-				$scope.search($scope.paginationConf.currentPage,$scope.paginationConf.itemsPerPage);
-			}
-			
-			//分页
-			$scope.findPage=function(page,size){
-				$http.get('../brand/findPage.do?page='+page+'&size='+size).success(
-					function(response){
-						$scope.paginationConf.totalItems=response.total;
-						$scope.list=response.rows;
-					}		
-				);
-			}
-			
-			//增加
-			$scope.save=function(){
-				var methodName = 'add';//如果没有id执行添加方法
-				if($scope.entity.id != null){
-					methodName ='update';//如果有id执行修改方法
-				}
-				
-				$http.post('../brand/'+methodName+'.do',$scope.entity).success(
-					function(response){
-						if(response.success){
-							$scope.reloadList();
-						}else{
-							alert(response.message);
-						}
-					}		
-				);
-			}
-			
-			//查询一个
-			$scope.findOne=function(id){
-				$http.get('../brand/findOne.do?id='+id).success(
-					function(response){
-						$scope.entity=response;
-					}		
-				);
-			}
-			
-			//创建一个数组，保存用户勾选中复选框的id
-			$scope.selectedIds = [];
-			$scope.getIds=function($event,id){
-				if($event.target.checked){
-					$scope.selectedIds.push(id);
-				}else{
-					var index=$scope.selectedIds.indexOf(id);
-					$scope.selectedIds.splice(index,1);
-				}
-			}
-			
-			//删除选中
-			$scope.del=function(ids){
-				$http.get('../brand/delete.do?ids='+$scope.selectedIds).success(
-					function(response){
-						if(response.success){
-							$scope.reloadList();
-						}else{
-							alert(response.message);
-						}
-					}
-					
-				);
-			}
-			
-			//条件查询
-			//初始化查询条件对象
-			$scope.searchEntity={};
-			$scope.search=function(page,size){
-				$http.post('../brand/search.do?page='+page+'&size='+size,$scope.searchEntity).success(
-					function(response){
-						$scope.paginationConf.totalItems=response.total;
-						$scope.list=response.rows;
-					}		
-				);
-			}
-		});
+	<script src="../js/base_pagination.js"></script>
+	<script src="../js/service/brandService.js"></script>
+	<script src="../js/controller/baseController.js"></script>
+	<script src="../js/controller/brandController.js"></script>
 	
-	</script>
     
 </head>
 <body class="hold-transition skin-red sidebar-mini" ng-app="pinyougou" ng-controller="brandController">

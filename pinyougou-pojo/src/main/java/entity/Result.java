@@ -9,8 +9,8 @@ import java.io.Serializable;
 
 public class Result implements Serializable{
 
-	private boolean success;
-	private String message;
+	private boolean success;//执行成功与否
+	private String message;//提示信息
 	
 	
 	
