@@ -199,13 +199,10 @@
 		                                <div ng-repeat="pojo in specList">
 			                                <div class="col-md-2 title">{{pojo.text}}</div>
 					                        <div class="col-md-10 data">
-					                               
 					                            <span ng-repeat="option in pojo.options">
 					                            	<input  type="checkbox" ng-click="updateSpecAttribute($event,pojo.text,option.optionName);createItemList()" 
 					                            	ng-checked="checkAttributeValue(pojo.text,option.optionName)">{{option.optionName}}					                            				                            	
-					                            </span>  	
-																							
-					                         	
+					                            </span>  
 					                        </div>
 		                                </div>   
 										  
@@ -320,7 +317,6 @@
             
             <!-- 正文区域 /-->
 <script type="text/javascript">
-
 	var editor;
 	KindEditor.ready(function(K) {
 		editor = K.create('textarea[name="content"]', {
