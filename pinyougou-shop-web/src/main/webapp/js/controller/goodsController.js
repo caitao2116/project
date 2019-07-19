@@ -115,6 +115,27 @@ app.controller('goodsController' ,function($scope,$controller,$location ,goodsSe
 		);				
 	}
 	
+	
+	$scope.goodsMarketableStatus=['下架中','上架中'];
+	
+	//批量上下架
+	$scope.upAndDownStock=function(status){
+		alert(111);
+		alert(JSON.stringify($scope.selectIds));
+		goodsService.upAndDownStock($scope.selectIds,status).success(
+			function(response){
+				alert(JSON.stringify(response));
+				if(response.success){
+					$scope.reloadList();//刷新列表
+					$scope.selectIds=[];
+				}else{
+					alert(response.message);
+				}
+			}
+		);
+	}
+	
+	
 	$scope.searchEntity={};//定义搜索对象 
 	
 	//搜索

@@ -1,4 +1,6 @@
 package com.pinyougou.sellergoods.service.impl;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+
 import com.pinyougou.mapper.TbBrandMapper;
 import com.pinyougou.mapper.TbGoodsDescMapper;
 import com.pinyougou.mapper.TbGoodsMapper;
@@ -84,6 +87,8 @@ public class GoodsServiceImpl implements GoodsService {
 	public void add(Goods goods) {
 		//设置商品的状态为未审核
 		goods.getGoods().setAuditStatus("0");
+		//默认商品的状态是上架状态
+		goods.getGoods().setIsMarketable("1");
 		goodsMapper.insert(goods.getGoods());
 		
 		//返回商品ID并设置到扩展表中
@@ -135,6 +140,8 @@ public class GoodsServiceImpl implements GoodsService {
 		item.setCategoryid(goods.getGoods().getCategory3Id());
 		//创建日期
 		item.setCreateTime(new Date());
+		//审核状态为未审核
+		item.setAuditStatus("0");
 		//更新日期
 		item.setUpdateTime(new Date());
 		//商家ID
@@ -264,7 +271,52 @@ public class GoodsServiceImpl implements GoodsService {
 				goods.setId(id);
 				goods.setAuditStatus(status);
 				goodsMapper.updateByPrimaryKeySelective(goods);
+				TbItem item = new TbItem();
+				item.setAuditStatus(status);
+				item.setGoodsId(id);
+				TbItemExample example =new TbItemExample();
+				com.pinyougou.pojo.TbItemExample.Criteria criteria = example.createCriteria();
+				criteria.andGoodsIdEqualTo(id);
+				itemMapper.updateByExampleSelective(item, example );
+				
+			}
 			
+		}
+
+		@Override
+		public List<TbItem> findItemListByGoodsIdandStatus(Long[] goodsIds, String status) {
+			TbItemExample example = new TbItemExample();
+			com.pinyougou.pojo.TbItemExample.Criteria criteria = example.createCriteria();
+			criteria.andGoodsIdIn(Arrays.asList(goodsIds));
+			criteria.andStatusEqualTo(status);
+			
+			return itemMapper.selectByExample(example);
+		}
+
+		/**
+		 * 商品上下架
+		 */
+		@Override
+		public void upAndDownStock(Long[] ids,String status) {
+			for(Long id:ids) {
+				
+				TbGoods goods = new TbGoods();
+				goods.setId(id);
+				goods.setIsMarketable(status);
+				if("1".equals(status)) {
+					goods.setAuditStatus("0");
+				}
+				goodsMapper.updateByPrimaryKeySelective(goods);
+				
+				TbItem item = new TbItem();
+				item.setStatus(status);
+				if("1".equals(status)) {
+					item.setAuditStatus("0");
+				}
+				TbItemExample example = new TbItemExample();
+				com.pinyougou.pojo.TbItemExample.Criteria criteria = example.createCriteria();
+				criteria.andGoodsIdEqualTo(id);
+				itemMapper.updateByExampleSelective(item, example);
 			}
 			
 		}

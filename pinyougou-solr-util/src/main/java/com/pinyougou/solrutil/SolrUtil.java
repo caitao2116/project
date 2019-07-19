@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.solr.core.SolrTemplate;
+
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -15,6 +16,8 @@ import com.pinyougou.mapper.TbItemMapper;
 import com.pinyougou.pojo.TbItem;
 import com.pinyougou.pojo.TbItemExample;
 import com.pinyougou.pojo.TbItemExample.Criteria;
+
+
 
 @Component
 public class SolrUtil {
@@ -31,6 +34,7 @@ public class SolrUtil {
 		TbItemExample example = new TbItemExample();
 		Criteria criteria = example.createCriteria();
 		criteria.andStatusEqualTo("1");
+		criteria.andAuditStatusEqualTo("1");
 		List<TbItem> itemList = tbItemMapper.selectByExample(example);
 		System.out.println("---商品列表---");
 		for(TbItem item:itemList) {

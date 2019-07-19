@@ -31,7 +31,17 @@ public class TbItem implements Serializable {
 
     private Long categoryid;
 
-    private String status;
+    private String auditStatus;
+    
+    public String getAuditStatus() {
+		return auditStatus;
+	}
+
+	public void setAuditStatus(String auditStatus) {
+		this.auditStatus = auditStatus;
+	}
+
+	private String status;
 
     private Date createTime;
     

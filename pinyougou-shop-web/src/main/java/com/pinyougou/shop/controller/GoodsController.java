@@ -1,6 +1,14 @@
 package com.pinyougou.shop.controller;
 import java.util.List;
 
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -127,4 +135,49 @@ public class GoodsController {
 		return goodsService.findPage(goods, page, rows);		
 	}
 	
+	@Autowired
+	private JmsTemplate jmsTemplate;
+	
+	@Autowired
+	private Destination queueSolrDeleteDestination;
+	
+	@Autowired
+	private Destination topicPageDeleteDestination;
+	
+	/**
+	 * 批量上下架
+	 * @param ids
+	 * @param status
+	 */
+	@RequestMapping("/upAndDownStock")
+	public Result upAndDownStock(final Long[] ids,String status) {
+		
+		try {
+			goodsService.upAndDownStock(ids, status);
+			if("0".equals(status)) {
+				//下架时，删除索引库的相关索引
+				jmsTemplate.send(queueSolrDeleteDestination, new MessageCreator() {
+					@Override
+					public Message createMessage(Session session) throws JMSException {
+						// TODO Auto-generated method stub
+						return session.createObjectMessage(ids);
+					}
+				});
+				
+				//在商品下架时，删除商品详情页面
+				jmsTemplate.send(topicPageDeleteDestination, new MessageCreator() {
+					@Override
+					public Message createMessage(Session session) throws JMSException {
+						// TODO Auto-generated method stub
+						return session.createObjectMessage(ids);
+					}
+				});
+			}
+			return new Result(true, "操作成功");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Result(false, "操作失败");
+		}
+	}
 }
